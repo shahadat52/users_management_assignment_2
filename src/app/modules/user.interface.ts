@@ -13,7 +13,11 @@ export type TOrder = {
   price: number;
   quantity: number;
 };
-export type TOrderArr = TOrder[];
+export type Order = {
+  productName: string;
+  price: number;
+  quantity: number;
+};
 
 export type TUser = {
   userId: number;
@@ -25,5 +29,5 @@ export type TUser = {
   isActive: boolean;
   hobbies: string[];
   address: TAddress;
-  orders?: TOrderArr;
+  orders?: Order[];
 };

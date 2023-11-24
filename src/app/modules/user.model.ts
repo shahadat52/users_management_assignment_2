@@ -1,11 +1,7 @@
 import { Schema, model } from 'mongoose';
-import {
-  TAddress,
-  TFullName,
-  TOrder,
-  TOrderArr,
-  TUser,
-} from './user.interface';
+import { TAddress, TFullName, TOrder, TUser } from './user.interface';
+import bcrypt from 'bcrypt';
+import config from '../config';
 
 const userFullNameSchema = new Schema<TFullName>({
   firstName: {
@@ -33,21 +29,11 @@ const addressSchema = new Schema<TAddress>({
   },
 });
 
-const orderSchema = new Schema<TOrder>({
-  product: {
-    type: String,
-    required: false,
-  },
-  price: {
-    type: Number,
-    required: false,
-  },
-  quantity: {
-    type: Number,
-    required: false,
-  },
+const OrderSchema = new Schema<TOrder>({
+  product: { type: String, required: true },
+  price: { type: Number, required: true },
+  quantity: { type: Number, required: true },
 });
-const orderArrSchema = new Schema<TOrderArr>([orderSchema]);
 
 const userSchema = new Schema<TUser>({
   userId: {
@@ -83,7 +69,22 @@ const userSchema = new Schema<TUser>({
     required: [true, 'Hobbies must be required'],
   },
   address: addressSchema,
-  orders: orderArrSchema,
+
+  orders: [OrderSchema],
+});
+
+//make hashing password
+userSchema.pre('save', async function (next) {
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const user = this;
+  console.log(user.password);
+  user.password = await bcrypt.hash(user.password, Number(config.bcrypt_salt));
+  next();
+});
+
+userSchema.post('save', function (doc, next) {
+  doc.password = '';
+  next();
 });
 
 export const UserModel = model<TUser>('User', userSchema);
