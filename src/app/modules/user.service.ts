@@ -22,7 +22,7 @@ const getAllUsersDataFromDb = async () => {
 };
 
 //single user data retrieve from database
-const getSingleUsersDataFromDb = async (id: number) => {
+const getSingleUsersDataFromDb = async (id: string) => {
   if (await UserM.isUserExists(id)) {
     const userId = Number(id);
     const result = await UserM.aggregate([
@@ -37,7 +37,7 @@ const getSingleUsersDataFromDb = async (id: number) => {
 };
 
 //store order
-const storeOrderInDb = async (id: number, orderData: TOrder) => {
+const storeOrderInDb = async (id: string, orderData: TOrder) => {
   console.log(typeof id);
   if (await UserM.isUserExists(id)) {
     const result = await UserM.updateOne(
@@ -54,7 +54,7 @@ const storeOrderInDb = async (id: number, orderData: TOrder) => {
 };
 
 //user delete
-const userDeleteFromDb = async (id) => {
+const userDeleteFromDb = async (id: string) => {
   const uId = Number(id);
   if (await UserM.isUserExists(uId)) {
     const result = await UserM.deleteOne({ userId: uId });
@@ -63,14 +63,16 @@ const userDeleteFromDb = async (id) => {
 };
 
 //update user information
-const updateUserInfoInDb = async (userId: number, newData) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const updateUserInfoInDb = async (id: number, newData: any) => {
+  const userId = Number(id);
   if (await UserM.isUserExists(userId)) {
     const result = await UserM.updateOne({ userId: userId }, { $set: newData });
     return result;
   }
 };
 
-const getOrdersOfUserFromDb = async (id) => {
+const getOrdersOfUserFromDb = async (id: string) => {
   const userId = Number(id);
   console.log(userId);
   if (await UserM.isUserExists(userId)) {
@@ -82,6 +84,26 @@ const getOrdersOfUserFromDb = async (id) => {
   }
 };
 
+const calculateTotalPriceInDb = async (id: string) => {
+  const userId = Number(id);
+
+  const result = await UserM.aggregate([
+    { $match: { userId: userId } },
+    { $project: { orders: 1 } },
+    { $unwind: '$orders' },
+    {
+      $project: { total: { $multiply: ['$orders.price', '$orders.quantity'] } },
+    },
+    {
+      $group: {
+        _id: null,
+        totalSalary: { $sum: '$total' },
+      },
+    },
+  ]);
+  return result;
+};
+
 export const userService = {
   createUserInDb,
   getAllUsersDataFromDb,
@@ -90,4 +112,5 @@ export const userService = {
   userDeleteFromDb,
   updateUserInfoInDb,
   getOrdersOfUserFromDb,
+  calculateTotalPriceInDb,
 };

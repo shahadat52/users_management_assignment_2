@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { userService } from './user.service';
 import userValidationSchema from './validation/user.validation';
 
+// Create User in database
 const createUser = async (req: Request, res: Response) => {
   try {
     const userData = req.body;
@@ -128,10 +129,33 @@ const updateUserInfo = async (req: Request, res: Response) => {
   }
 };
 
-const getOrdersOfUser = async (req: Request, res: Response) => {
+// Get all orders of specific user
+const getAllOrdersOfUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const result = await userService.getOrdersOfUserFromDb(userId);
+    res.status(500).json({
+      success: true,
+      message: 'User orders retrieve Successfully',
+      data: result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: 'User not found',
+      error: {
+        code: 404,
+        description: 'User not found!',
+      },
+    });
+  }
+};
+
+// calculate total price of user
+const calculateTotalPrice = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const result = await userService.calculateTotalPriceInDb(userId);
     res.status(500).json({
       success: true,
       message: 'User orders retrieve Successfully',
@@ -156,5 +180,6 @@ export const userController = {
   storeOrder,
   userDelete,
   updateUserInfo,
-  getOrdersOfUser,
+  getAllOrdersOfUser,
+  calculateTotalPrice,
 };
