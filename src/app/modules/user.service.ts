@@ -1,46 +1,81 @@
 import { TOrder, TUser } from './user.interface';
-import { UserModel } from './user.model';
+import { UserM } from './user.model';
 
 // Create a user in database
+// const createUserInDb = async (userData: TUser) => {
+//   const { userId } = userData;
+//   console.log(userId);
+//   if (await UserM.isUserExists(userId)) {
+//     throw new Error('Student already exists');
+//   }
+
+//   const result = await UserM.create(userData);
+//   return result;
+//  };
 const createUserInDb = async (userData: TUser) => {
-  const result = await UserModel.create(userData);
+  console.log('userId', userData.userId);
+  // if (await UserM.isUserExists(userData.userId)) {
+  //   throw new Error('User already exists');
+  // }
+  // const {userId} = userData
+  const result = await UserM.create(userData);
   return result;
 };
 
 //All users data retrieve from database
 const getAllUsersDataFromDb = async () => {
-  const result = await UserModel.find();
+  // const result = await UserM.find();
+  const result = await UserM.aggregate([
+    { $match: {} },
+    { $project: { userName: 1, fullName: 1, age: 1, email: 1, address: 1 } },
+  ]);
   return result;
 };
 
-//All users data retrieve from database
-const getSingleUsersDataFromDb = async (id: string) => {
-  const result = await UserModel.findOne({ userId: id });
-  return result;
+//single user data retrieve from database
+const getSingleUsersDataFromDb = async (id: number) => {
+  if (await UserM.isUserExists(id)) {
+    const userId = Number(id);
+    const result = await UserM.aggregate([
+      { $match: { userId: userId } },
+      { $project: { password: 0 } },
+    ]);
+    return result;
+  }
 };
 
-const storeOrderInDb = async (id: string, orderData: TOrder) => {
-  // console.log(orderData);
-  const result = await UserModel.updateOne(
-    { userId: id },
-    {
-      $push: {
-        orders: orderData,
+//store order
+const storeOrderInDb = async (id: number, orderData: TOrder) => {
+  console.log(typeof id);
+  if (await UserM.isUserExists(id)) {
+    const result = await UserM.updateOne(
+      { userId: id },
+      {
+        $push: {
+          orders: orderData,
+        },
       },
-    },
-  );
-  console.log(result);
-  return result;
+    );
+    console.log(result);
+    return result;
+  }
 };
 
-const userDeleteFromDb = async (userId: string) => {
-  const result = await UserModel.deleteOne({ userId: userId });
-  return result;
+//user delete
+const userDeleteFromDb = async (id) => {
+  const uId = Number(id);
+  if (await UserM.isUserExists(uId)) {
+    const result = await UserM.deleteOne({ userId: uId });
+    return result;
+  }
 };
 
-const updateUserInfoInDb = async (userId: string, newData) => {
-  const result = await UserModel.findOne({ userId: userId }, { $set: newData });
-  return result;
+//update user information
+const updateUserInfoInDb = async (userId: number, newData) => {
+  if (await UserM.isUserExists(userId)) {
+    const result = await UserM.updateOne({ userId: userId }, { $set: newData });
+    return result;
+  }
 };
 
 export const userService = {

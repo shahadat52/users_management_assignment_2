@@ -1,5 +1,11 @@
 import { Schema, model } from 'mongoose';
-import { TAddress, TFullName, TOrder, TUser } from './user.interface';
+import {
+  TAddress,
+  TFullName,
+  TOrder,
+  TUser,
+  UserModelForMethod,
+} from './user.interface';
 import bcrypt from 'bcrypt';
 import config from '../config';
 
@@ -35,7 +41,7 @@ const OrderSchema = new Schema<TOrder>({
   quantity: { type: Number, required: true },
 });
 
-const userSchema = new Schema<TUser>({
+const userSchema = new Schema<TUser, UserModelForMethod>({
   userId: {
     type: Number,
     required: [true, 'User Id must be required'],
@@ -77,7 +83,6 @@ const userSchema = new Schema<TUser>({
 userSchema.pre('save', async function (next) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const user = this;
-  console.log(user.password);
   user.password = await bcrypt.hash(user.password, Number(config.bcrypt_salt));
   next();
 });
@@ -87,4 +92,16 @@ userSchema.post('save', function (doc, next) {
   next();
 });
 
-export const UserModel = model<TUser>('User', userSchema);
+userSchema.post('findOne', function (doc, next) {
+  console.log(doc);
+  doc.password = '';
+  next();
+});
+
+//create static method for check is user exists
+userSchema.statics.isUserExists = async function (userId: number) {
+  const exists = await UserM.findOne({ userId });
+  return exists;
+};
+
+export const UserM = model<TUser, UserModelForMethod>('User', userSchema);

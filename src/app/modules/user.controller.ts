@@ -3,20 +3,41 @@ import { userService } from './user.service';
 import userValidationSchema from './validation/user.validation';
 
 const createUser = async (req: Request, res: Response) => {
+  // try {
+  //   const userData = req.body;
+  //   const validUserData = userValidationSchema.parse(userData);
+  //   const result = await userService.createUserInDb(validUserData);
+  //   console.log('ahare',result);
+  //   res.status(500).json({
+  //     success: true,
+  //     message: 'User Create Successfully',
+  //     data: result,
+  //   });
+  // } catch (error: unknown) {
+  //   console.log("boooooooo",error);
+  //   res.status(404).json({
+  //     success: false,
+  //     message: 'User Create Unsuccessful',
+  //     error: error.message
+  //   });
+  // }
+
   try {
     const userData = req.body;
     const validUserData = userValidationSchema.parse(userData);
+    // console.log( validUserData);
     const result = await userService.createUserInDb(validUserData);
-    res.status(500).json({
+    console.log('validData', result);
+    res.status(200).json({
       success: true,
       message: 'User Create Successfully',
       data: result,
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(500).json({
       success: false,
       message: 'User Create Unsuccessful',
-      data: error,
+      data: error.message,
     });
   }
 };
@@ -50,8 +71,11 @@ const getSingleUser = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: 'Single User Retrieve Unsuccessful',
-      data: error,
+      message: 'User not found',
+      error: {
+        code: 404,
+        description: 'User not found!',
+      },
     });
   }
 };
@@ -59,18 +83,22 @@ const storeOrder = async (req: Request, res: Response) => {
   try {
     const orderData = req.body;
     const { userId } = req.params;
-    // console.log(userId, orderData);
+
+    console.log(userId, orderData);
     const result = await userService.storeOrderInDb(userId, orderData);
     res.status(500).json({
       success: true,
-      message: ' Order update Successfully',
-      data: result,
+      message: 'Order created successfully!',
+      data: null,
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(404).json({
       success: false,
-      message: 'Order Update Unsuccessful',
-      data: error,
+      message: 'User not found',
+      error: {
+        code: 404,
+        description: 'User not found!',
+      },
     });
   }
 };
@@ -82,33 +110,38 @@ const userDelete = async (req: Request, res: Response) => {
     const result = await userService.userDeleteFromDb(userId);
     res.status(500).json({
       success: true,
-      message: 'User delete Successfully',
-      data: result,
+      message: 'User deleted successfully!',
+      data: null,
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(404).json({
       success: false,
-      message: 'User delete Unsuccessful',
-      data: error,
+      message: 'User not found',
+      error: {
+        code: 404,
+        description: 'User not found!',
+      },
     });
   }
 };
 const updateUserInfo = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    const updateData = req.body;
-    console.log(userId);
-    const result = await userService.userDeleteFromDb(userId);
+    const newData = req.body;
+    const result = await userService.updateUserInfoInDb(userId, newData);
     res.status(500).json({
       success: true,
-      message: 'User delete Successfully',
+      message: 'User data update Successfully',
       data: result,
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      message: 'User delete Unsuccessful',
-      data: error,
+      message: 'User not found',
+      error: {
+        code: 404,
+        description: 'User not found!',
+      },
     });
   }
 };

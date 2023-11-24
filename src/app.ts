@@ -10,7 +10,7 @@ app.use(cors());
 app.use('/api/users', userRouters);
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Hello World!');
+  res.send('Hello this is user-management application');
 });
 
 export default app;
