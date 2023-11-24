@@ -2,22 +2,11 @@ import { TOrder, TUser } from './user.interface';
 import { UserM } from './user.model';
 
 // Create a user in database
-// const createUserInDb = async (userData: TUser) => {
-//   const { userId } = userData;
-//   console.log(userId);
-//   if (await UserM.isUserExists(userId)) {
-//     throw new Error('Student already exists');
-//   }
-
-//   const result = await UserM.create(userData);
-//   return result;
-//  };
 const createUserInDb = async (userData: TUser) => {
-  console.log('userId', userData.userId);
-  // if (await UserM.isUserExists(userData.userId)) {
-  //   throw new Error('User already exists');
-  // }
-  // const {userId} = userData
+  if (await UserM.isUserExists(userData.userId)) {
+    throw new Error('Student already exists');
+  }
+
   const result = await UserM.create(userData);
   return result;
 };
@@ -40,7 +29,10 @@ const getSingleUsersDataFromDb = async (id: number) => {
       { $match: { userId: userId } },
       { $project: { password: 0 } },
     ]);
+    console.log('hmmmm', result);
     return result;
+  } else {
+    return null;
   }
 };
 
@@ -78,6 +70,18 @@ const updateUserInfoInDb = async (userId: number, newData) => {
   }
 };
 
+const getOrdersOfUserFromDb = async (id) => {
+  const userId = Number(id);
+  console.log(userId);
+  if (await UserM.isUserExists(userId)) {
+    const result = await UserM.aggregate([
+      { $match: { userId: userId } },
+      { $project: { orders: 1 } },
+    ]);
+    return result;
+  }
+};
+
 export const userService = {
   createUserInDb,
   getAllUsersDataFromDb,
@@ -85,4 +89,5 @@ export const userService = {
   storeOrderInDb,
   userDeleteFromDb,
   updateUserInfoInDb,
+  getOrdersOfUserFromDb,
 };

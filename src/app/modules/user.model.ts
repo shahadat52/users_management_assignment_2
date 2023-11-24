@@ -92,16 +92,15 @@ userSchema.post('save', function (doc, next) {
   next();
 });
 
+//create static method for check is user exists
+userSchema.statics.isUserExists = async function (userId: number) {
+  const exists = await UserM.findOne({ userId: userId });
+  return exists;
+};
+
 userSchema.post('findOne', function (doc, next) {
-  console.log(doc);
   doc.password = '';
   next();
 });
-
-//create static method for check is user exists
-userSchema.statics.isUserExists = async function (userId: number) {
-  const exists = await UserM.findOne({ userId });
-  return exists;
-};
 
 export const UserM = model<TUser, UserModelForMethod>('User', userSchema);

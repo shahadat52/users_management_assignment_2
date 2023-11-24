@@ -3,25 +3,6 @@ import { userService } from './user.service';
 import userValidationSchema from './validation/user.validation';
 
 const createUser = async (req: Request, res: Response) => {
-  // try {
-  //   const userData = req.body;
-  //   const validUserData = userValidationSchema.parse(userData);
-  //   const result = await userService.createUserInDb(validUserData);
-  //   console.log('ahare',result);
-  //   res.status(500).json({
-  //     success: true,
-  //     message: 'User Create Successfully',
-  //     data: result,
-  //   });
-  // } catch (error: unknown) {
-  //   console.log("boooooooo",error);
-  //   res.status(404).json({
-  //     success: false,
-  //     message: 'User Create Unsuccessful',
-  //     error: error.message
-  //   });
-  // }
-
   try {
     const userData = req.body;
     const validUserData = userValidationSchema.parse(userData);
@@ -63,13 +44,14 @@ const getSingleUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const result = await userService.getSingleUsersDataFromDb(userId);
+    console.log(result);
     res.status(500).json({
       success: true,
       message: ' Single User Retrieve Successfully',
       data: result,
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(404).json({
       success: false,
       message: 'User not found',
       error: {
@@ -146,6 +128,27 @@ const updateUserInfo = async (req: Request, res: Response) => {
   }
 };
 
+const getOrdersOfUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const result = await userService.getOrdersOfUserFromDb(userId);
+    res.status(500).json({
+      success: true,
+      message: 'User orders retrieve Successfully',
+      data: result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      message: 'User not found',
+      error: {
+        code: 404,
+        description: 'User not found!',
+      },
+    });
+  }
+};
+
 export const userController = {
   createUser,
   getAllUsers,
@@ -153,4 +156,5 @@ export const userController = {
   storeOrder,
   userDelete,
   updateUserInfo,
+  getOrdersOfUser,
 };
