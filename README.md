@@ -1,6 +1,6 @@
 # User-management application
 
-live link:- https://user-management-assignment-2-mmnnlo4ak-shahadat52.vercel.app/
+live link:-https://user-management-assignment-2.vercel.app
 
 This is a user management backend application.It was build with node(Express), Mongoose, Typescript. In this app we can store users data, and user order in mongodb database etc, It was secure by bcrypt password hashing system. Every data was properly validate. For validation purpose we use here zod validation system
 
@@ -13,8 +13,8 @@ First of all you have to ensure that node, npm, mongodb are install in your pc
 👉🏻 project will run http://localhost:5000.
 👉🏻 Then run "npm run build" and then "npm run start-dev" ok your project is ready
 
-
 API endpoint structure
+
 1.  Create a new user:- POST /api/users
 2.  Retrieve a list of all users:- GET /api/users
 3.  Retrieve a specific user by ID:- GET /api/users/:userId
@@ -23,5 +23,3 @@ API endpoint structure
 6.  Add New Product in Order:- PUT /api/users/:userId/orders
 7.  Retrieve all orders for a specific user:- GET /api/users/:userId/orders
 8.  Calculate Total Price of Orders for a Specific User:- GET /api/users/:userId/orders/total-price
-
-
