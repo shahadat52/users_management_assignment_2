@@ -33,6 +33,7 @@ const getSingleUsersDataFromDb = async (id: string) => {
 
     return result;
   }
+
   throw new Error('User not available');
 };
 
@@ -76,7 +77,6 @@ const updateUserInfoInDb = async (id: string, newData: TUpdateUser) => {
 
 const getOrdersOfUserFromDb = async (id: string) => {
   const userId = Number(id);
-  console.log(userId);
   if (await UserM.isUserExists(userId)) {
     const result = await UserM.aggregate([
       { $match: { userId: userId } },

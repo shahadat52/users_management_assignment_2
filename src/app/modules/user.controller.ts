@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { userService } from './user.service';
 import userValidationSchema from './validation/user.validation';
-import { TOrder } from './user.interface';
+import { TOrder, TUpdateUser } from './user.interface';
 import userInfoUpdateValidationSchema, {
   OrderValidationSchema,
 } from './validation/userInfoUpdate.validation';
@@ -47,7 +47,6 @@ const getSingleUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const result = await userService.getSingleUsersDataFromDb(userId);
-    console.log(result);
     res.status(500).json({
       success: true,
       message: ' Single User Retrieve Successfully',
@@ -87,12 +86,11 @@ const storeOrder = async (req: Request, res: Response) => {
 const userDelete = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    console.log(userId);
     const result = await userService.userDeleteFromDb(userId);
     res.status(500).json({
       success: true,
       message: 'User deleted successfully!',
-      data: null,
+      data: result,
     });
   } catch (error) {
     res.status(404).json({
@@ -116,7 +114,8 @@ const updateUserInfo = async (req: Request, res: Response) => {
       message: 'User data update Successfully',
       data: result,
     });
-  } catch (error) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
     res.status(400).json({
       success: false,
       message: error.message,
@@ -152,9 +151,16 @@ const calculateTotalPrice = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
     const result = await userService.calculateTotalPriceInDb(userId);
+    if (result.length === 0) {
+      return res.status(500).json({
+        success: true,
+        message: 'User have no order',
+        data: result,
+      });
+    }
     res.status(500).json({
       success: true,
-      message: 'User orders retrieve Successfully',
+      message: 'User total price of orders calculate successfully',
       data: result,
     });
   } catch (error) {
