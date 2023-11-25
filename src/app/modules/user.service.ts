@@ -1,4 +1,4 @@
-import { TOrder, TUser } from './user.interface';
+import { TOrder, TUpdateUser, TUser } from './user.interface';
 import { UserM } from './user.model';
 
 // Create a user in database
@@ -23,23 +23,23 @@ const getAllUsersDataFromDb = async () => {
 
 //single user data retrieve from database
 const getSingleUsersDataFromDb = async (id: string) => {
-  if (await UserM.isUserExists(id)) {
+  const userId = Number(id);
+  if (await UserM.isUserExists(userId)) {
     const userId = Number(id);
     const result = await UserM.aggregate([
       { $match: { userId: userId } },
       { $project: { password: 0 } },
     ]);
-    console.log('hmmmm', result);
+
     return result;
-  } else {
-    return null;
   }
+  throw new Error('User not available');
 };
 
 //store order
 const storeOrderInDb = async (id: string, orderData: TOrder) => {
-  console.log(typeof id);
-  if (await UserM.isUserExists(id)) {
+  const userId = Number(id);
+  if (await UserM.isUserExists(userId)) {
     const result = await UserM.updateOne(
       { userId: id },
       {
@@ -48,28 +48,30 @@ const storeOrderInDb = async (id: string, orderData: TOrder) => {
         },
       },
     );
-    console.log(result);
     return result;
   }
+  throw new Error('User not available');
 };
 
 //user delete
 const userDeleteFromDb = async (id: string) => {
-  const uId = Number(id);
-  if (await UserM.isUserExists(uId)) {
-    const result = await UserM.deleteOne({ userId: uId });
+  const userId = Number(id);
+  if (await UserM.isUserExists(userId)) {
+    const result = await UserM.deleteOne({ userId: userId });
     return result;
   }
+  throw new Error('User not available');
 };
 
 //update user information
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const updateUserInfoInDb = async (id: number, newData: any) => {
+const updateUserInfoInDb = async (id: string, newData: TUpdateUser) => {
   const userId = Number(id);
   if (await UserM.isUserExists(userId)) {
     const result = await UserM.updateOne({ userId: userId }, { $set: newData });
     return result;
   }
+  throw new Error('User not available');
 };
 
 const getOrdersOfUserFromDb = async (id: string) => {
@@ -86,22 +88,26 @@ const getOrdersOfUserFromDb = async (id: string) => {
 
 const calculateTotalPriceInDb = async (id: string) => {
   const userId = Number(id);
-
-  const result = await UserM.aggregate([
-    { $match: { userId: userId } },
-    { $project: { orders: 1 } },
-    { $unwind: '$orders' },
-    {
-      $project: { total: { $multiply: ['$orders.price', '$orders.quantity'] } },
-    },
-    {
-      $group: {
-        _id: null,
-        totalSalary: { $sum: '$total' },
+  if (await UserM.isUserExists(userId)) {
+    const result = await UserM.aggregate([
+      { $match: { userId: userId } },
+      { $project: { orders: 1 } },
+      { $unwind: '$orders' },
+      {
+        $project: {
+          total: { $multiply: ['$orders.price', '$orders.quantity'] },
+        },
       },
-    },
-  ]);
-  return result;
+      {
+        $group: {
+          _id: null,
+          totalPrice: { $sum: '$total' },
+        },
+      },
+    ]);
+    return result;
+  }
+  throw new Error('User not found');
 };
 
 export const userService = {

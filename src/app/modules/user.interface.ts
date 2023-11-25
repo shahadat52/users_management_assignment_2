@@ -11,7 +11,7 @@ export type TAddress = {
 };
 
 export type TOrder = {
-  product: string;
+  productName: string;
   price: number;
   quantity: number;
 };
@@ -32,6 +32,24 @@ export type TUser = {
   hobbies: string[];
   address: TAddress;
   orders?: Order[];
+};
+
+export type TUpdateUser = {
+  userId: 'number';
+  userName: 'string';
+  fullName: {
+    firstName: 'string';
+    lastName: 'string';
+  };
+  age: 'number';
+  email: 'string';
+  isActive: 'boolean';
+  hobbies: ['string', 'string'];
+  address: {
+    street: 'string';
+    city: 'string';
+    country: 'string';
+  };
 };
 
 export interface UserModelForMethod extends Model<TUser> {

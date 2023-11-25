@@ -36,7 +36,7 @@ const addressSchema = new Schema<TAddress>({
 });
 
 const OrderSchema = new Schema<TOrder>({
-  product: { type: String, required: true },
+  productName: { type: String, required: true },
   price: { type: Number, required: true },
   quantity: { type: Number, required: true },
 });
@@ -98,9 +98,9 @@ userSchema.statics.isUserExists = async function (userId: number) {
   return exists;
 };
 
-userSchema.post('findOne', function (doc, next) {
-  doc.password = '';
-  next();
-});
+// userSchema.post('findOne', function (doc, next) {
+//   doc.password = '';
+//   next();
+// });
 
 export const UserM = model<TUser, UserModelForMethod>('User', userSchema);
