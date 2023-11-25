@@ -84,6 +84,7 @@ const getOrdersOfUserFromDb = async (id: string) => {
     ]);
     return result;
   }
+  throw new Error('User not found');
 };
 
 const calculateTotalPriceInDb = async (id: string) => {
