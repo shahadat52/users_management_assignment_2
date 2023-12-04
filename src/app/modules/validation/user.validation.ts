@@ -49,9 +49,9 @@ const userValidationSchema = z.object({
     required_error: 'userId is required',
     invalid_type_error: 'userId must be a Number',
   }),
-  userName: z.string({
-    required_error: 'userName is required',
-    invalid_type_error: 'userName must be a string',
+  username: z.string({
+    required_error: 'username is required',
+    invalid_type_error: 'username must be a string',
   }),
   password: z
     .string({

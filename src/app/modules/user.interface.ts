@@ -23,7 +23,7 @@ export type Order = {
 
 export type TUser = {
   userId: number;
-  userName: string;
+  username: string;
   password: string;
   fullName: TFullName;
   age: number;
@@ -36,7 +36,7 @@ export type TUser = {
 
 export type TUpdateUser = {
   userId: 'number';
-  userName: 'string';
+  username: 'string';
   fullName: {
     firstName: 'string';
     lastName: 'string';
